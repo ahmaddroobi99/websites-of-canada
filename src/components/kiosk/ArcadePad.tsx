@@ -20,7 +20,7 @@ export function ArcadePad() {
   };
 
   return (
-    <div className="pointer-events-auto absolute bottom-4 right-4 z-30 hidden w-[220px] rounded-sm bg-[#9a1c1c] p-3 shadow-2xl md:block">
+    <div className="pointer-events-auto absolute bottom-4 right-4 z-30 hidden w-[228px] rounded-md bg-[#8b1818] p-3 shadow-[0_18px_40px_rgba(0,0,0,0.45)] md:block">
       <div className="mb-3 flex justify-center">
         <Joystick onMove={nudge} />
       </div>
@@ -32,7 +32,7 @@ export function ArcadePad() {
           <Search className="size-4" />
         </RoundBtn>
         <RoundBtn label="Zoom out" className="bg-danger text-fg" onClick={() => nudge(0, 0, -1)}>
-          <Minus className="size-4" />
+          <Plus className="size-4" />
         </RoundBtn>
         <RoundBtn label="Select" className="bg-finder text-bg" onClick={select}>
           <Play className="size-4 fill-current" />
@@ -45,7 +45,7 @@ export function ArcadePad() {
         </RoundBtn>
       </div>
       <p className="mt-2 text-center text-[10px] text-white/70">
-        {focusId ? "Site open" : "WASD pan · +/− zoom"}
+        {mode === "attract" ? "Green to start" : focusId ? "Site open" : "WASD pan · +/− zoom"}
       </p>
     </div>
   );
@@ -67,7 +67,7 @@ function RoundBtn({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className={`grid size-11 place-items-center rounded-full shadow-inner ${className}`}
+      className={`grid size-11 place-items-center rounded-full shadow-[inset_0_2px_4px_rgba(255,255,255,0.35),0_3px_0_rgba(0,0,0,0.35)] transition-transform duration-150 ease-out active:scale-[0.96] ${className}`}
     >
       {children}
     </button>
@@ -96,7 +96,8 @@ function Joystick({ onMove }: { onMove: (dx: number, dy: number) => void }) {
         window.addEventListener("pointerup", up);
       }}
     >
-      <div className="absolute left-1/2 top-1/2 size-9 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3b9eff] shadow-md" />
+      <div className="absolute left-1/2 top-[18%] h-7 w-3.5 -translate-x-1/2 rounded-sm bg-[#1a1a1a]" />
+      <div className="absolute left-1/2 top-1/2 size-9 -translate-x-1/2 -translate-y-1/2 rounded-full bg-reset shadow-md" />
     </div>
   );
 }

@@ -116,6 +116,7 @@ const state = {
   path: [],
   graph: null,
   visited: [],
+  era: null,
 };
 const $ = (id) => document.getElementById(id);
 const canvas = $("mosaic");
@@ -223,6 +224,8 @@ function start() {
   $("attract").hidden = true;
   $("finder").hidden = false;
   $("searchChip").hidden = false;
+  $("eraRail").hidden = false;
+  $("labBtn").hidden = false;
   fly(WORLD.w * 0.48, WORLD.h * 0.4, 0.38);
 }
 function reset() {
@@ -233,6 +236,10 @@ function reset() {
   $("attract").hidden = false;
   $("finder").hidden = true;
   $("searchChip").hidden = true;
+  $("eraRail").hidden = true;
+  $("labBtn").hidden = true;
+  $("labModal").hidden = true;
+  $("focusCap").hidden = true;
   $("viewer").hidden = true;
   $("searchModal").hidden = true;
   fly(WORLD.w * 0.5, WORLD.h * 0.42, 0.22);
@@ -357,6 +364,19 @@ $("searchChip").onclick = () => {
   $("searchModal").hidden = !$("searchModal").hidden;
   $("searchInput").focus();
 };
+$("openLab").onclick = () => {
+  $("labModal").hidden = false;
+};
+$("closeLab").onclick = () => {
+  $("labModal").hidden = true;
+};
+$("eraRail").onclick = (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  state.era = btn.dataset.era ? Number(btn.dataset.era) : null;
+  [...$("eraRail").querySelectorAll("button")].forEach((b) => b.classList.toggle("on", b === btn));
+  toast(state.era ? "Era " + state.era : "All years");
+};
 $("searchForm").onsubmit = (e) => {
   e.preventDefault();
   runQuery($("searchInput").value);
@@ -435,6 +455,7 @@ function draw() {
     if (x > w || y > h || x + tw < 0 || y + th < 0) continue;
     ctx.fillStyle = s.featured ? s.accent : s.color;
     ctx.globalAlpha = s.filler ? 0.75 : 1;
+    if (state.era && !s.years.some((y) => Math.abs(y - state.era) <= 4)) ctx.globalAlpha = 0.16;
     ctx.fillRect(x, y, Math.max(1, tw * 0.92), Math.max(1, th * 0.92));
     ctx.globalAlpha = 1;
     if (lod && s.featured && tw > 70) {
@@ -484,6 +505,11 @@ function loop(now) {
   state.cam.z += (state.target.z - state.cam.z) * t * 2.2;
   const mid = { x: state.cam.x, y: state.cam.y };
   state.hover = catalog.find((s) => Math.abs(s.x - mid.x) < WORLD.tw / 2 && Math.abs(s.y - mid.y) < WORLD.th / 2) || null;
+  const cap = $("focusCap");
+  if (state.mode === "explore" && state.hover && state.cam.z > 0.7) {
+    cap.hidden = false;
+    cap.innerHTML = `<b>${state.hover.title}</b><span>${state.hover.host}</span>`;
+  } else cap.hidden = true;
   draw();
   requestAnimationFrame(loop);
 }

@@ -73,6 +73,20 @@ button { font-family: inherit; }
 .film button.on { border-color: var(--finder); }
 .actions { display: flex; gap: 8px; padding: 8px; flex-wrap: wrap; }
 .actions button { height: 36px; padding: 0 12px; border: 0; cursor: pointer; }
+#eraRail { position: absolute; top: 64px; left: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 5; }
+#eraRail button { height: 28px; border: 0; background: #1a1e28; color: #9aa3b2; font-size: 11px; cursor: pointer; padding: 0 8px; }
+#eraRail button.on { background: #3ddc84; color: #07090d; }
+#focusCap { position: absolute; left: 50%; bottom: 26%; transform: translateX(-50%); text-align: center; z-index: 4; pointer-events: none; text-shadow: 0 2px 8px #000; }
+#focusCap b { display: block; font-size: 22px; }
+#labBtn { position: absolute; top: 16px; right: 12px; z-index: 6; }
+#labBtn button, #closeLab { background: #1a1e28; color: #f3f4f6; border: 1px solid #2a3140; height: 32px; padding: 0 10px; cursor: pointer; }
+#labModal { position: absolute; inset: 0; background: rgba(7,9,13,0.55); z-index: 10; display: grid; place-items: center; padding: 16px; }
+.labCard { background: #12151c; border: 1px solid #2a3140; padding: 20px; max-width: 560px; max-height: 80vh; overflow: auto; }
+.labCard ul { padding-left: 18px; color: #9aa3b2; font-size: 13px; line-height: 1.5; }
+#finder .c { width: 64px; height: 64px; }
+#finder .tl { border-width: 12px 0 0 12px; }
+#finder .tr { border-width: 12px 12px 0 0; }
+#finder .bl { border-width: 0 0 12px 12px; }
 [hidden] { display: none !important; }
 @media (max-width: 640px) {
   header h1 { font-size: 0.95rem; padding: 8px; }

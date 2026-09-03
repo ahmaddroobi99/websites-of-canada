@@ -1,5 +1,15 @@
 import { useEffect, useRef } from "react";
-import { CATALOG, FEATURED, TILE_H, TILE_W, WORLD_H, WORLD_W, type Site } from "@/lib/catalog";
+import {
+  CATALOG,
+  CATEGORY_META,
+  FEATURED,
+  TILE_H,
+  TILE_W,
+  WORLD_H,
+  WORLD_W,
+  occupancy,
+  type Site,
+} from "@/lib/catalog";
 import { useKiosk } from "@/store/kiosk-store";
 
 const cache = new Map<string, HTMLCanvasElement>();
@@ -109,6 +119,7 @@ function paintHomepage(c: HTMLCanvasElement, site: Site) {
     ctx.fillText(site.title.slice(0, 22), 12, navH + 28);
   }
 
+  void hashHue(site.id);
   ctx.fillStyle = "rgba(0,0,0,0.55)";
   ctx.fillRect(0, h - 16, w, 16);
   ctx.fillStyle = "#fff";
@@ -190,12 +201,25 @@ export function MosaicCanvas() {
           e.preventDefault();
         }
         if (e.code === "Escape") {
-          if (st.mode === "site") st.closeSite();
+          if (st.labOpen) st.toggleLab(false);
+          else if (st.mode === "site") st.closeSite();
           else if (st.searchOpen) st.toggleSearch(false);
           e.preventDefault();
         }
         if (e.code === "KeyR" && !e.metaKey && !e.ctrlKey) {
           st.reset();
+          e.preventDefault();
+        }
+        if (e.code === "KeyT" && !e.metaKey && !e.ctrlKey) {
+          st.tourPlaying ? st.stopTour() : st.startTour();
+          e.preventDefault();
+        }
+        if (e.code === "KeyH" && !e.metaKey && !e.ctrlKey) {
+          st.toggleHeat();
+          e.preventDefault();
+        }
+        if (e.code === "KeyL" && !e.metaKey && !e.ctrlKey) {
+          st.toggleLab();
           e.preventDefault();
         }
         if (e.code === "Space") {
@@ -233,6 +257,10 @@ export function MosaicCanvas() {
       trace: () => useKiosk.getState().runTrace(),
       recommend: () => useKiosk.getState().runRecommend(),
       policy: (p: "auto" | "greedy" | "bfs" | "astar") => useKiosk.getState().setPolicy(p),
+      tour: () => useKiosk.getState().startTour(),
+      heat: () => useKiosk.getState().toggleHeat(),
+      lab: () => useKiosk.getState().toggleLab(true),
+      era: (y: number | null) => useKiosk.getState().setEraYear(y),
     };
 
     return () => {
@@ -343,7 +371,7 @@ export function MosaicCanvas() {
 }
 
 function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  const { camera, hoverId, focusId, rec, mode } = useKiosk.getState();
+  const { camera, hoverId, focusId, rec, mode, eraYear, heatOn, visited } = useKiosk.getState();
   ctx.fillStyle = "#07090d";
   ctx.fillRect(0, 0, w, h);
 
@@ -356,20 +384,54 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
   ctx.rect(0, 0, w, h);
   ctx.clip();
 
+  if (heatOn && mode !== "attract") {
+    for (const [cat, meta] of Object.entries(CATEGORY_META)) {
+      const occ = occupancy(cat as Site["category"]);
+      const x = meta.hx * WORLD_W * z + ox;
+      const y = meta.hy * WORLD_H * z + oy;
+      const r = 90 + occ * 220;
+      const g = ctx.createRadialGradient(x, y, 8, x, y, r);
+      g.addColorStop(0, `rgba(61,220,132,${0.08 + occ * 0.22})`);
+      g.addColorStop(1, "rgba(61,220,132,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
   const tw = TILE_W * z;
   const th = TILE_H * z;
   const pad = 80;
   const lod = z < 0.35 ? 0 : z < 0.85 ? 1 : 2;
+
+  if (lod === 0) {
+    ctx.textAlign = "center";
+    for (const meta of Object.values(CATEGORY_META)) {
+      const x = meta.hx * WORLD_W * z + ox;
+      const y = meta.hy * WORLD_H * z + oy;
+      ctx.fillStyle = "rgba(243,244,246,0.55)";
+      ctx.font = `600 12px Outfit, sans-serif`;
+      ctx.fillText(meta.label, x, y);
+    }
+    ctx.textAlign = "left";
+  }
 
   for (const s of CATALOG) {
     const x = s.x * z + ox - tw / 2;
     const y = s.y * z + oy - th / 2;
     if (x > w + pad || y > h + pad || x + tw < -pad || y + th < -pad) continue;
 
+    const inEra =
+      !eraYear ||
+      s.years.some((yr) => Math.abs(yr - eraYear) <= 3) ||
+      (s.years[0] <= eraYear && s.years[s.years.length - 1] >= eraYear);
     const hot = s.id === hoverId || s.id === focusId;
+    const seen = visited.includes(s.id);
+    ctx.globalAlpha = inEra ? (s.filler ? 0.78 : 1) : 0.16;
+
     if (lod === 0 || (!s.featured && lod < 2 && tw < 22)) {
       ctx.fillStyle = s.featured ? s.accent : s.color;
-      ctx.globalAlpha = s.filler ? 0.7 : 1;
       ctx.fillRect(x, y, Math.max(1.2, tw * 0.92), Math.max(1.2, th * 0.92));
       ctx.globalAlpha = 1;
       continue;
@@ -385,6 +447,12 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
       ctx.fillRect(x, y, tw, Math.max(3, th * 0.14));
     }
 
+    if (seen) {
+      ctx.strokeStyle = "rgba(59,158,255,0.7)";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x + 1, y + 1, tw - 2, th - 2);
+    }
+
     if (hot) {
       ctx.strokeStyle = "#3ddc84";
       ctx.lineWidth = 2.5;
@@ -398,6 +466,7 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
       ctx.font = `500 ${Math.max(10, Math.min(13, tw * 0.08))}px "IBM Plex Sans", sans-serif`;
       ctx.fillText(s.host, x + 6, y + th - 7, tw - 12);
     }
+    ctx.globalAlpha = 1;
   }
 
   if (rec && rec.path.length && mode !== "attract") {
@@ -426,10 +495,6 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number) {
   }
 
   ctx.restore();
-
-  if (mode !== "attract" && z < 0.55) {
-    ctx.fillStyle = "rgba(7,9,13,0.0)";
-  }
 }
 
 declare global {
@@ -448,6 +513,10 @@ declare global {
       trace: () => void;
       recommend: () => void;
       policy: (p: "auto" | "greedy" | "bfs" | "astar") => void;
+      tour: () => void;
+      heat: () => void;
+      lab: () => void;
+      era: (y: number | null) => void;
     };
   }
 }

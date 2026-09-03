@@ -7,9 +7,9 @@
       "status": 200,
       "title": "Websites of Canada",
       "hasCanvas": true,
-      "bodyTextLen": 600,
-      "bodyTextHash": "1d4b23991d0eb3460bec65578c09345f6be74e2ba322ab14b4d31bc6e8008a8e",
-      "bodyTextPrefix": "Internet Archive Europe Websites of Canada Reset FR nepeansenior",
+      "bodyTextLen": 958,
+      "bodyTextHash": "48fbd4eade010b23071a06d4329022301b157c0bd7a6add5186777995eeb1748",
+      "bodyTextPrefix": "Internet Archive Europe Websites of Canada Reset FR Nepean Senio",
       "horizontalOverflow": false,
       "consoleErrors": [],
       "pageErrors": [],
@@ -30,10 +30,7 @@
       "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
     }
   },
-  "brandWarnings": [
-    "BRAND WARNING: this looks like a game/canvas app but src/lib/og/site.json is missing \"type\": \"x:game\". X uses og:type=x:game to present the unfurl as a game card — set it in /workspace/src/lib/og/site.json per /workspace/.grok/skills/og/SKILL.md. Do not invent x:type or overload twitter:card as the game signal.",
-    "BRAND WARNING: this looks like a game/canvas app but /workspace/public/x-banner.jpg is missing. Games need a 50:11 X feed card (1200×264 JPEG) at public/x-banner.jpg — open /workspace/.grok/skills/og/SKILL.md and finish the brand-asset pass."
-  ],
+  "brandWarnings": [],
   "authWarnings": [],
   "verdictFile": "/workspace/screenshots/app-builder-preview.json"
 }

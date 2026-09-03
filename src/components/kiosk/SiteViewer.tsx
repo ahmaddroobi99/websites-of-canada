@@ -1,4 +1,4 @@
-import { ExternalLink, GitGraph, Route as RouteIcon, X } from "lucide-react";
+import { Columns2, ExternalLink, GitGraph, Route as RouteIcon, X } from "lucide-react";
 import { useMemo } from "react";
 import { BY_ID, CATEGORY_META } from "@/lib/catalog";
 import { useKiosk } from "@/store/kiosk-store";
@@ -18,6 +18,9 @@ export function SiteViewer() {
   const rec = useKiosk((s) => s.rec);
   const policy = useKiosk((s) => s.policy);
   const setPolicy = useKiosk((s) => s.setPolicy);
+  const startTour = useKiosk((s) => s.startTour);
+  const compareYear = useKiosk((s) => s.compareYear);
+  const setCompareYear = useKiosk((s) => s.setCompareYear);
 
   const site = focusId ? BY_ID.get(focusId) : null;
   if (mode !== "site" || !site) return null;
@@ -28,8 +31,8 @@ export function SiteViewer() {
   const lo = Math.min(...years);
 
   return (
-    <div className="absolute inset-0 z-20 flex items-center justify-center bg-bg/40 p-3 sm:p-8">
-      <div className="relative flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-md border border-line bg-surface shadow-2xl">
+    <div className="absolute inset-0 z-20 flex items-center justify-center bg-bg/50 p-3 sm:p-8">
+      <div className="kiosk-enter relative flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-md border border-line bg-surface shadow-2xl">
         <div className="flex items-center gap-3 bg-[#111111] px-3 py-2 text-xs text-fg">
           <span className="rounded-sm bg-danger px-1.5 py-0.5 font-display font-bold tracking-wide">
             INTERNET ARCHIVE Wayback Machine
@@ -58,7 +61,7 @@ export function SiteViewer() {
         </div>
 
         <div className="relative min-h-0 flex-1 bg-elevated">
-          <HomepagePreview siteId={site.id} year={year} />
+          <HomepagePreview siteId={site.id} year={year} compareYear={compareYear} />
           <div className="absolute bottom-3 left-3 rounded-sm bg-finder/90 px-2 py-1 font-mono text-xs text-bg">
             TIME {hi}–{lo}
           </div>
@@ -92,10 +95,30 @@ export function SiteViewer() {
             <button
               type="button"
               onClick={runRecommend}
-              className="inline-flex h-9 items-center gap-1.5 rounded-md bg-search px-3 text-sm font-medium text-search-fg"
+              className="inline-flex h-9 items-center gap-1.5 rounded-md bg-search px-3 text-sm font-medium text-search-fg transition-transform duration-150 active:scale-[0.96]"
             >
               <RouteIcon className="size-4" />
               Recommend
+            </button>
+            <button
+              type="button"
+              onClick={startTour}
+              className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-elevated px-3 text-sm font-medium"
+            >
+              Tour
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const others = years.filter((y) => y !== year);
+                setCompareYear(compareYear ? null : (others[0] ?? null));
+              }}
+              className={`inline-flex h-9 items-center gap-1.5 rounded-md border px-3 text-sm font-medium ${
+                compareYear ? "border-finder bg-elevated text-fg" : "border-line bg-elevated"
+              }`}
+            >
+              <Columns2 className="size-4" />
+              Compare
             </button>
             <PolicyPills policy={policy} onChange={setPolicy} />
             <span className="ml-auto text-xs text-muted">{site.tagline}</span>
@@ -109,7 +132,37 @@ export function SiteViewer() {
   );
 }
 
-function HomepagePreview({ siteId, year }: { siteId: string; year: number | null }) {
+function HomepagePreview({
+  siteId,
+  year,
+  compareYear,
+}: {
+  siteId: string;
+  year: number | null;
+  compareYear?: number | null;
+}) {
+  if (compareYear && compareYear !== year) {
+    return (
+      <div className="grid h-full min-h-0 grid-cols-2">
+        <div className="relative min-h-0 overflow-hidden border-r border-line">
+          <SingleHomepage siteId={siteId} year={year} />
+          <span className="absolute left-2 top-2 rounded-sm bg-bg/80 px-2 py-0.5 font-mono text-[11px] text-fg">
+            {year}
+          </span>
+        </div>
+        <div className="relative min-h-0 overflow-hidden">
+          <SingleHomepage siteId={siteId} year={compareYear} />
+          <span className="absolute left-2 top-2 rounded-sm bg-bg/80 px-2 py-0.5 font-mono text-[11px] text-fg">
+            {compareYear}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return <SingleHomepage siteId={siteId} year={year} />;
+}
+
+function SingleHomepage({ siteId, year }: { siteId: string; year: number | null }) {
   if (siteId === "nepean") return <NepeanPage />;
   if (siteId === "buildjyn") return <JynPage year={year} />;
   if (siteId === "mtltimes") return <TimesPage />;
@@ -338,13 +391,19 @@ function posOf(node: TraceNode | undefined, all: TraceNode[]) {
 function RecommendPanel() {
   const rec = useKiosk((s) => s.rec)!;
   const openSite = useKiosk((s) => s.openSite);
+  const startTour = useKiosk((s) => s.startTour);
   return (
     <div className="absolute bottom-28 left-3 right-3 rounded-md border border-line bg-surface/95 p-3 shadow-lg">
       <div className="mb-1 flex items-baseline justify-between gap-3">
         <h3 className="font-display font-semibold">
           Next five · {rec.resolved}
         </h3>
-        <span className="text-xs text-muted">occupancy {rec.occupancy.toFixed(2)}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted">occupancy {rec.occupancy.toFixed(2)}</span>
+          <button type="button" onClick={startTour} className="text-xs font-medium text-search">
+            Play tour
+          </button>
+        </div>
       </div>
       <p className="mb-2 text-xs text-muted">{rec.reason}</p>
       <ol className="flex flex-wrap gap-2">

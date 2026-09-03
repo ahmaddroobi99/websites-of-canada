@@ -41,7 +41,7 @@ export function SearchOverlay() {
 
   return (
     <div className="absolute inset-0 z-40 flex items-end justify-center bg-bg/50 p-4 sm:items-center">
-      <div className="w-full max-w-xl rounded-lg border border-line bg-surface p-4 shadow-2xl">
+      <div className="kiosk-enter w-full max-w-xl rounded-lg border border-line bg-surface p-4 shadow-2xl">
         <div className="mb-3 flex items-center justify-between">
           <p className="font-display text-lg font-semibold">Search the Canadian web</p>
           <button type="button" onClick={() => toggleSearch(false)} className="rounded-sm p-1 text-muted hover:text-fg">

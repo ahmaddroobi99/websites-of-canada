@@ -49,6 +49,31 @@
       </p>
     </div>
     <button id="searchChip" type="button" hidden>Search</button>
+    <div id="eraRail" hidden>
+      <button type="button" data-era="">All</button>
+      <button type="button" data-era="2001">2001</button>
+      <button type="button" data-era="2008">2008</button>
+      <button type="button" data-era="2014">2014</button>
+      <button type="button" data-era="2020">2020</button>
+    </div>
+    <div id="focusCap" hidden></div>
+    <div id="minimap" hidden></div>
+    <div id="labBtn" hidden><button type="button" id="openLab">Lab</button></div>
+    <div id="labModal" hidden>
+      <div class="labCard">
+        <h2>Next exhibits</h2>
+        <p>Applied here: era filter, occupancy heat, guided tour, minimap. Sibling applications reuse this mosaic.</p>
+        <ul>
+          <li><strong>Websites of Switzerland</strong> — original Nextension / SNL lineage.</li>
+          <li><strong>Websites of a City</strong> — municipal archive kiosk.</li>
+          <li><strong>Classroom pack</strong> — era + tour as a digital-heritage lab.</li>
+          <li><strong>Library install kit</strong> — attract timeout, large type, arcade pad.</li>
+          <li><strong>Resource-graph studio</strong> — live crawler for one consented .ca seed.</li>
+          <li><strong>Occupancy lab</strong> — greedy / BFS / A* as a DoE visualizer.</li>
+        </ul>
+        <button type="button" id="closeLab">Close</button>
+      </div>
+    </div>
     <div id="searchModal" hidden>
       <form id="searchForm">
         <input id="searchInput" placeholder="open montreal times · show seniors · year 2001" />
