@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Websites of Canada",
+      "hasCanvas": true,
+      "bodyTextLen": 708,
+      "bodyTextHash": "79efe318f10368671f7a11b9604cb1a82311999493b1980ed8f7780a169b77e5",
+      "bodyTextPrefix": "Internet Archive Europe Websites of Canada Reset FR nepeansenior",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Websites of Canada",
+      "hasCanvas": true,
+      "bodyTextLen": 688,
+      "bodyTextHash": "fdd035a731d40d292e6a7543430e3bd874b70195d56591c9933e4542ce234d62",
+      "bodyTextPrefix": "Internet Archive Europe Websites of Canada Reset FR nepeansenior",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Websites of Canada</title>
+    <meta
+      name="description"
+      content="A browser tribute to the VPL / Internet Archive Canada kiosk."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,600&family=Outfit:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <canvas id="mosaic"></canvas>
+    <div id="finder" hidden>
+      <i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i>
+      <div id="zoomHint">Zoom in for more</div>
+    </div>
+    <header>
+      <div class="brand">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+          <rect x="4" y="6" width="20" height="3" fill="currentColor" />
+          <rect x="6" y="11" width="3" height="11" fill="currentColor" />
+          <rect x="12.5" y="11" width="3" height="11" fill="currentColor" />
+          <rect x="19" y="11" width="3" height="11" fill="currentColor" />
+          <rect x="4" y="23" width="20" height="2" fill="currentColor" />
+        </svg>
+        <span>Internet<br />Archive Europe</span>
+      </div>
+      <h1>Websites of Canada</h1>
+      <button id="resetBtn" type="button">Reset</button>
+    </header>
+    <div id="attract">
+      <button id="startBtn" type="button">
+        <span class="title">Internet Archive Europe</span>
+        <span class="cta">PRESS BUTTON TO START</span>
+      </button>
+      <p class="credit">
+        Tribute to Websites of Canada at Vancouver Public Library. Original exhibit: Internet Archive
+        Canada × VPL, presented by Internet Archive Europe. Interaction concept: Kai Jauslin /
+        Nextension. Not an official Internet Archive product.
+      </p>
+    </div>
+    <button id="searchChip" type="button" hidden>Search</button>
+    <div id="searchModal" hidden>
+      <form id="searchForm">
+        <input id="searchInput" placeholder="open montreal times · show seniors · year 2001" />
+        <button type="submit">Go</button>
+      </form>
+      <ul id="searchHits"></ul>
+    </div>
+    <div id="viewer" hidden></div>
+    <p id="toast" hidden></p>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

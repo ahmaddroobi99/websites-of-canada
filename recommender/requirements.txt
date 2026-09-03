@@ -1,0 +1,2 @@
+# Sidecar only — the kiosk itself is browser JS.
+# policies.py is stdlib.
