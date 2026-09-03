@@ -90,56 +90,28 @@ function bfsPath(start: Site, visited: Set<string>, n: number): Site[] {
 }
 
 function astarPath(start: Site, visited: Set<string>, n: number): Site[] {
-  const targets = CATALOG.filter(
-    (s) => s.featured && s.id !== start.id && !visited.has(s.id) && s.category !== start.category,
-  );
   const goal =
-    targets.sort((a, b) => {
-      const da = semanticPenalty(start, a) + yearGap(start, a);
-      const db = semanticPenalty(start, b) + yearGap(start, b);
-      return da - db;
-    })[0] ?? CATALOG.find((s) => s.id !== start.id)!;
+    CATALOG.filter(
+      (s) => s.featured && s.id !== start.id && !visited.has(s.id) && s.category !== start.category,
+    ).sort((a, b) => edgeCost(start, a) - edgeCost(start, b))[0] ??
+    CATALOG.find((s) => s.id !== start.id && !visited.has(s.id));
+  if (!goal) return [];
 
-  type Node = { id: string; g: number; f: number };
-  const open: Node[] = [{ id: start.id, g: 0, f: edgeCost(start, goal) }];
-  const gScore = new Map<string, number>([[start.id, 0]]);
-  const came = new Map<string, string>();
-  const closed = new Set<string>();
+  const waypoints = CATALOG.filter(
+    (s) => s.featured && s.id !== start.id && s.id !== goal.id && !visited.has(s.id),
+  )
+    .sort((a, b) => {
+      const fa = edgeCost(start, a) + edgeCost(a, goal);
+      const fb = edgeCost(start, b) + edgeCost(b, goal);
+      const catA = a.category === start.category ? 0.35 : 0;
+      const catB = b.category === start.category ? 0.35 : 0;
+      return fa + catA - (fb + catB);
+    })
+    .slice(0, Math.max(0, n - 1));
 
-  while (open.length) {
-    open.sort((a, b) => a.f - b.f);
-    const cur = open.shift()!;
-    if (closed.has(cur.id)) continue;
-    closed.add(cur.id);
-    if (cur.id === goal.id) break;
-    const site = BY_ID.get(cur.id)!;
-    const neigh = unused(site, visited)
-      .filter((s) => !closed.has(s.id))
-      .sort((a, b) => edgeCost(site, a) - edgeCost(site, b))
-      .slice(0, 10);
-    for (const nb of neigh) {
-      const tentative = cur.g + edgeCost(site, nb);
-      if (tentative < (gScore.get(nb.id) ?? Infinity)) {
-        gScore.set(nb.id, tentative);
-        came.set(nb.id, cur.id);
-        const h = edgeCost(nb, goal) + (visited.has(nb.id) ? 2 : 0);
-        open.push({ id: nb.id, g: tentative, f: tentative + h });
-      }
-    }
-    if (closed.size > 220) break;
-  }
-
-  const chain: string[] = [];
-  let walk: string | undefined = came.has(goal.id) ? goal.id : [...came.keys()].pop();
-  while (walk && walk !== start.id) {
-    chain.push(walk);
-    walk = came.get(walk);
-  }
-  chain.reverse();
-  return chain
-    .map((id) => BY_ID.get(id)!)
-    .filter(Boolean)
-    .slice(0, n);
+  const path = [...waypoints, goal];
+  const seen = new Set<string>();
+  return path.filter((s) => (seen.has(s.id) ? false : (seen.add(s.id), true))).slice(0, n);
 }
 
 export function recommend(start: Site, visitedIds: string[], requested: Policy, n = 5): RecommendResult {
